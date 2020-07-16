@@ -4,11 +4,11 @@ import { Menu, Game } from './components';
 const App = () => {
   const [StartGame, updateStartGame] = React.useState(false);
   const [Players, updatePlayers] = React.useState(1);
-  const [Guesser, updateGuesser] = React.useState(1);
+  const [Guesser, updateGuesser] = React.useState<[number, number]>([1, 2]);
 
   const restart = (status: boolean) => {
     updateStartGame(status);
-    updateGuesser(Guesser + 1 % 2);
+    updateGuesser([ Guesser[1], Guesser[0] ]);
   };
 
   return !StartGame ? 

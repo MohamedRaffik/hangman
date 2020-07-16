@@ -3,7 +3,7 @@ import { Hangman } from './Hangman';
 
 interface GameProps {
   players: number;
-  guesser: number;
+  guesser: [number, number];
   restart: (status: boolean) => void;
 }
 
@@ -12,6 +12,7 @@ export const Game = (props: GameProps) => {
   const [Word, updateWord] = React.useState('');
   const [SelectedLetters, updateSelectedLetters] = React.useState<{ [letter: string]: boolean }>({});
   const [StatusMessage, updateStatusMessage] = React.useState('');
+  const [GameOver, updateGameOver] = React.useState(false);
 
   React.useEffect(() => {
     if (props.players === 1) {
@@ -21,9 +22,18 @@ export const Game = (props: GameProps) => {
 
   React.useEffect(() => {
     if (ErrorCount === 6) {
-      updateStatusMessage(props.players === 1 ? 'You Lost' : `Player ${props.guesser + 1 % 2} Lost`);
+      updateStatusMessage(props.players === 1 ? 'You Lost !' : `Player ${props.guesser[1]} Lost !`);
+      updateGameOver(true);
+      return;
     }
-  }, [ErrorCount, props.players, props.guesser])
+    if (Word.length !== 0) {
+      for (const letter of Word) {
+        if (!SelectedLetters[letter]) return;
+      }
+      updateStatusMessage(props.players === 1 ? 'You Won !' : `Player ${props.guesser[1]} Won !`);
+      updateGameOver(true);  
+    }
+  }, [ErrorCount, props.players, props.guesser, SelectedLetters, Word])
 
   const setWord = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,7 +75,7 @@ export const Game = (props: GameProps) => {
     <div>
       <div style={{ display: 'flex', flexDirection: 'row'}}>
         <div style={{ padding: '5em' }}>
-          <h2>Player {props.guesser}</h2> 
+          <h2>Player {props.guesser[0]}</h2> 
           <h2>Enter in a Word: </h2>
           <form onSubmit={setWord}>
             <input name="word" style={{height: '2em', width: '20em'}}></input>  
@@ -73,7 +83,7 @@ export const Game = (props: GameProps) => {
           </form>
         </div>  
         <div style={{ padding: '5em' }}>
-          <h2>Player {props.guesser + 1 % 2}</h2>
+          <h2>Player {props.guesser[1]}</h2>
           <h2>LOOK AWAY FROM THE SCREEN !!!</h2>  
         </div>
       </div>
@@ -104,10 +114,10 @@ export const Game = (props: GameProps) => {
     };
     const e = AllLetters.map(letter => (
       <h3 
-        id="menu-option" 
+        className="menu-option" 
         key={'select' + letter}
         style={{ textDecoration: SelectedLetters[letter] ? 'line-through' : '', color: color(letter)}} 
-        onClick={() => SelectedLetters[letter] ? null : selectLetter(letter)}
+        onClick={() => SelectedLetters[letter] || GameOver ? null : selectLetter(letter)}
       >
         {letter}
       </h3>
@@ -120,7 +130,7 @@ export const Game = (props: GameProps) => {
   };
 
   return (
-    <div className="menu" onClick={() => ErrorCount === 6 ? props.restart(false) : null }>
+    <div className="menu" onClick={() => GameOver ? props.restart(false) : null }>
       <h1 className="menu-heading">Hangman</h1>
       <p style={{ height: '1em' }}>{ StatusMessage }</p>
       <Hangman errors={ErrorCount} />
