@@ -7,7 +7,51 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.part {
+  stroke-dashoffset: 1000;
+  stroke-dasharray: 1000;
+  animation: draw 10s linear forwards;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+#menu {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+#menu-heading {
+  padding: 1em;
+}
+
+#menu-options {
+  display: flex;
+}
+
+#menu-option {
+  padding: 1em;
+}
+
+#menu-option:hover {
+  cursor: pointer;
+  color: grey;
+}
+
+.word-display-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 3em;
+}
+
+.word-display {
+  border-bottom: black solid 1px;
+  width: 2em;
+  margin: 1em;
+  text-align: center;
 }
