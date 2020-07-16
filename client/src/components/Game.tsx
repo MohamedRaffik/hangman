@@ -120,8 +120,8 @@ export const Game = (props: GameProps) => {
   };
 
   return (
-    <div id="menu" onClick={() => ErrorCount === 6 ? props.restart(false) : null }>
-      <h1 id="menu-heading">Hangman</h1>
+    <div className="menu" onClick={() => ErrorCount === 6 ? props.restart(false) : null }>
+      <h1 className="menu-heading">Hangman</h1>
       <p style={{ height: '1em' }}>{ StatusMessage }</p>
       <Hangman errors={ErrorCount} />
       {

@@ -19,25 +19,25 @@ body {
   }
 }
 
-#menu {
+.menu {
   display: flex;
   align-items: center;
   flex-direction: column;
 }
 
-#menu-heading {
+.menu-heading {
   padding: 1em;
 }
 
-#menu-options {
+.menu-options {
   display: flex;
 }
 
-#menu-option {
+.menu-option {
   padding: 1em;
 }
 
-#menu-option:hover {
+.menu-option:hover {
   cursor: pointer;
   color: grey;
 }
