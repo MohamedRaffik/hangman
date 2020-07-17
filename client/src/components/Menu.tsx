@@ -18,8 +18,8 @@ export const Menu = (props: MenuProps) => {
       <h1 className="menu-heading">Hangman</h1>
       <Hangman errors={6} />
       <div className="menu-options">
-        <h2 className="menu-option" onClick={() => onOptionSelect(1)}>One Player</h2>
-        <h2 className="menu-option" onClick={() => onOptionSelect(2)}>Two Players</h2>
+        <h2 className="menu-option" onClick={() => onOptionSelect(1)}>Single Player</h2>
+        <h2 className="menu-option" onClick={() => onOptionSelect(2)}>Multiplayer</h2>
       </div>
     </div>
   );

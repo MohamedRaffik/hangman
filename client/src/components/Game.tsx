@@ -14,26 +14,21 @@ export const Game = (props: GameProps) => {
   const [StatusMessage, updateStatusMessage] = React.useState('');
   const [GameOver, updateGameOver] = React.useState(false);
 
-  React.useEffect(() => {
-    if (props.players === 1) {
-      updateWord('TESTING');
+  const AllLetters = React.useMemo(() => {
+    const a = [];
+    for (let i = 0; i < 26; i++) {
+      a.push(String.fromCharCode('A'.charCodeAt(0) + i));
     }
+    return a;
   }, []);
 
-  React.useEffect(() => {
-    if (ErrorCount === 6) {
-      updateStatusMessage(props.players === 1 ? 'You Lost !' : `Player ${props.guesser[1]} Lost !`);
-      updateGameOver(true);
-      return;
+  const Letters = React.useMemo(() => {
+    const a = [];
+    for (const letter of Word) {
+      a.push(letter);
     }
-    if (Word.length !== 0) {
-      for (const letter of Word) {
-        if (!SelectedLetters[letter]) return;
-      }
-      updateStatusMessage(props.players === 1 ? 'You Won !' : `Player ${props.guesser[1]} Won !`);
-      updateGameOver(true);  
-    }
-  }, [ErrorCount, props.players, props.guesser, SelectedLetters, Word])
+    return a;
+  }, [Word]);
 
   const setWord = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -45,7 +40,6 @@ export const Game = (props: GameProps) => {
   };
 
   const selectLetter = (letter: string) => {
-    console.log(letter, Word);
     if (Word.indexOf(letter) === -1) {
       updateErrorCount(ErrorCount + 1);
       updateStatusMessage(`${letter} is not in the word !`);
@@ -55,34 +49,53 @@ export const Game = (props: GameProps) => {
     updateSelectedLetters({ ...SelectedLetters, [letter]: true });
   }
 
-  const Letters = React.useMemo(() => {
-    const a = [];
-    for (const letter of Word) {
-      a.push(letter);
+  const getWord = async () => {
+    try {
+      const response = await fetch('/randomword');
+      if (response.status !== 200) {
+        updateWord('SORRY WAS NOT ABLE TO GET RANDOM WORD');
+      }
+      const data = await response.json();
+      updateWord(data.word.toUpperCase());  
+    } catch (err) {
+      console.log(err);
+      updateWord('SORRY WAS NOT ABLE TO GET RANDOM WORD');
     }
-    return a;
-  }, [Word]);
+  }
 
-  const AllLetters = React.useMemo(() => {
-    const a = [];
-    for (let i = 0; i < 26; i++) {
-      a.push(String.fromCharCode('A'.charCodeAt(0) + i));
+  React.useEffect(() => {
+    if (props.players === 1) {
+      getWord();
     }
-    return a;
   }, []);
+
+  React.useEffect(() => {
+    if (ErrorCount === 6) {
+      updateStatusMessage(props.players === 1 ? 'You Lost !' : `Player ${props.guesser[1]} Lost !`);
+      updateGameOver(true);
+      return;
+    }
+    if (Word.length !== 0) {
+      for (const letter of Word) {
+        if (!SelectedLetters[letter] && ('A'.charCodeAt(0) <= letter.charCodeAt(0) && letter.charCodeAt(0) <= 'Z'.charCodeAt(0))) return;
+      }
+      updateStatusMessage(props.players === 1 ? 'You Won !' : `Player ${props.guesser[1]} Won !`);
+      updateGameOver(true);  
+    }
+  }, [ErrorCount, props.players, props.guesser, SelectedLetters, Word])
 
   const WordSelect = React.useCallback(() => (
     <div>
-      <div style={{ display: 'flex', flexDirection: 'row'}}>
-        <div style={{ padding: '5em' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+        <div style={{ margin: '1em', marginRight: '4em' }}>
           <h2>Player {props.guesser[0]}</h2> 
           <h2>Enter in a Word: </h2>
-          <form onSubmit={setWord}>
-            <input name="word" style={{height: '2em', width: '20em'}}></input>  
+          <form onSubmit={setWord} style={{ display: 'flex', flexDirection: 'row' }}>
+            <input style={{ height: '2em', width: '20em' }}></input>  
             <button>Enter</button>
           </form>
         </div>  
-        <div style={{ padding: '5em' }}>
+        <div style={{ margin: '1em', marginLeft: '4em' }}>
           <h2>Player {props.guesser[1]}</h2>
           <h2>LOOK AWAY FROM THE SCREEN !!!</h2>  
         </div>
@@ -91,17 +104,34 @@ export const Game = (props: GameProps) => {
   ), [props.guesser]);
 
   const WordDisplay = React.useCallback(() => {
+    const DisplayLetter = (letter: string) => {
+      if (SelectedLetters[letter] && ('A'.charCodeAt(0) <= letter.charCodeAt(0) && letter.charCodeAt(0) <= 'Z'.charCodeAt(0))) {
+        return true;
+      } else if (!('A'.charCodeAt(0) <= letter.charCodeAt(0) && letter.charCodeAt(0) <= 'Z'.charCodeAt(0))) {
+        return true;
+      } else if (GameOver) {
+        return true;
+      }
+      return false;
+    };
     const e = Letters.map((letter, index) => (
-      <p className="word-display" key={'X' + index} style={{ color: SelectedLetters[letter] ? 'black' : 'white' }}>
-        { SelectedLetters[letter] ? letter : 'X' }
-      </p>
+      <h2 
+        className="word-display" 
+        key={'X' + index} 
+        style={{ 
+          color: DisplayLetter(letter) ? 'black' : 'white', 
+          borderBottom: letter === ' ' ? 'white 1px solid' : 'black 1px solid' 
+        }}
+      >
+        { DisplayLetter(letter) ? letter : 'X' }
+      </h2>
     ));
     return (
       <div className="word-display-container">
         {e}
       </div>
     );
-  }, [SelectedLetters, Letters]);
+  }, [SelectedLetters, Letters, GameOver]);
 
   const LetterSelector = () => {
     const color = (letter: string) => {
@@ -114,16 +144,26 @@ export const Game = (props: GameProps) => {
     };
     const e = AllLetters.map(letter => (
       <h3 
-        className="menu-option" 
+        className="letter-select" 
         key={'select' + letter}
-        style={{ textDecoration: SelectedLetters[letter] ? 'line-through' : '', color: color(letter)}} 
+        style={{ textDecoration: SelectedLetters[letter] ? 'line-through' : '', color: color(letter) }} 
+        onMouseOver={(e) => {
+          if (color(letter) === 'black') {
+            e.currentTarget.style.color = 'grey';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (color(letter) === 'black') {
+            e.currentTarget.style.color = 'black';
+          }
+        }}
         onClick={() => SelectedLetters[letter] || GameOver ? null : selectLetter(letter)}
       >
         {letter}
       </h3>
     ));
     return (
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
         {e}
       </div>
     );
@@ -132,13 +172,14 @@ export const Game = (props: GameProps) => {
   return (
     <div className="menu" onClick={() => GameOver ? props.restart(false) : null }>
       <h1 className="menu-heading">Hangman</h1>
-      <p style={{ height: '1em' }}>{ StatusMessage }</p>
+      <p style={{ height: '0.5em' }}>{ StatusMessage }</p>
+      <p style={{ height: '0.5em' }}>{ GameOver ? 'Click Anywhere to Return to the Menu' : '' }</p>
       <Hangman errors={ErrorCount} />
       {
-        Word.length === 0 ? 
+        Word.length === 0  && props.players !== 1 ? 
         <WordSelect /> 
         :
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           <WordDisplay />
           <LetterSelector />
         </div>

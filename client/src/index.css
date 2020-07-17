@@ -5,6 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: whitesmoke;
 }
 
 .part {
@@ -35,22 +36,31 @@ body {
 
 .menu-option {
   padding: 1em;
+  margin: 1em;
+  border: solid 1px black;
+  border-radius: 40px;
 }
 
 .menu-option:hover {
   cursor: pointer;
   color: grey;
+  border: solid 1px grey;
+}
+
+.letter-select {
+  padding: 1em;
+  cursor: pointer;
 }
 
 .word-display-container {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
   padding: 3em;
 }
 
 .word-display {
-  border-bottom: black solid 1px;
   width: 2em;
   margin: 1em;
   text-align: center;

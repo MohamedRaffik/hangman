@@ -8,6 +8,7 @@ const App = () => {
 
   const restart = (status: boolean) => {
     updateStartGame(status);
+    if (Players === 1) return;
     updateGuesser([ Guesser[1], Guesser[0] ]);
   };
 
