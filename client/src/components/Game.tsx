@@ -140,7 +140,6 @@ export const Game = (props: GameProps) => {
       }
     }
     Words.push([...Letters.slice(last_empty + 1, Letters.length), ' ']);
-    console.log(Words);
     return (
       <div className="word-display-container">
         {
@@ -201,7 +200,7 @@ export const Game = (props: GameProps) => {
         <WordSelect /> 
         :
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <WordDisplay />
+          { Word.length === 0  ? <h2 className="word-display-container">Loading Word ...</h2> : <WordDisplay /> }
           <LetterSelector />
         </div>
       }
