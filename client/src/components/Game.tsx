@@ -42,9 +42,9 @@ export const Game = (props: GameProps) => {
   const selectLetter = (letter: string) => {
     if (Word.indexOf(letter) === -1) {
       updateErrorCount(ErrorCount + 1);
-      updateStatusMessage(`${letter} is not in the word !`);
+      updateStatusMessage(`${letter} is not in the phrase !`);
     } else {
-      updateStatusMessage(`${letter} is in the word !`)
+      updateStatusMessage(`${letter} is in the phrase !`)
     }
     updateSelectedLetters({ ...SelectedLetters, [letter]: true });
   }
@@ -53,13 +53,13 @@ export const Game = (props: GameProps) => {
     try {
       const response = await fetch('/randomword');
       if (response.status !== 200) {
-        updateWord('SORRY WAS NOT ABLE TO GET RANDOM WORD');
+        updateWord('SORRY WAS NOT ABLE TO GET RANDOM PHRASE');
       }
       const data = await response.json();
       updateWord(data.word.toUpperCase());  
     } catch (err) {
       console.log(err);
-      updateWord('SORRY WAS NOT ABLE TO GET RANDOM WORD');
+      updateWord('SORRY WAS NOT ABLE TO GET RANDOM PHRASE');
     }
   }
 
