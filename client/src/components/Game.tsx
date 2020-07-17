@@ -103,7 +103,7 @@ export const Game = (props: GameProps) => {
     </div>
   ), [props.guesser]);
 
-  const WordDisplay = React.useCallback(() => {
+  const SingleWord = (word: string[]) => {
     const DisplayLetter = (letter: string) => {
       if (SelectedLetters[letter] && ('A'.charCodeAt(0) <= letter.charCodeAt(0) && letter.charCodeAt(0) <= 'Z'.charCodeAt(0))) {
         return true;
@@ -114,7 +114,8 @@ export const Game = (props: GameProps) => {
       }
       return false;
     };
-    const e = Letters.map((letter, index) => (
+
+    return word.map((letter, index) => (
       <h2 
         className="word-display" 
         key={'X' + index} 
@@ -126,9 +127,29 @@ export const Game = (props: GameProps) => {
         { DisplayLetter(letter) ? letter : 'X' }
       </h2>
     ));
+  };
+
+  const WordDisplay = React.useCallback(() => {
+    const Words = [];
+    let last_empty = -1;
+    for (let i = 0; i < Letters.length; i++) {
+      const letter = Letters[i];
+      if (letter === ' ') {
+        Words.push([...Letters.slice(last_empty + 1, i), ' ']);
+        last_empty = i;
+      }
+    }
+    Words.push([...Letters.slice(last_empty + 1, Letters.length), ' ']);
+    console.log(Words);
     return (
       <div className="word-display-container">
-        {e}
+        {
+          Words.map((word, index) => (
+            <div key={'S' + index} style={{ display: 'flex', flexDirection: 'row' }}>
+              { SingleWord(word) }
+            </div>
+          ))
+        }
       </div>
     );
   }, [SelectedLetters, Letters, GameOver]);
